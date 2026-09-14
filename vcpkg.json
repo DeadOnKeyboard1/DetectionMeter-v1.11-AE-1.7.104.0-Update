@@ -1,0 +1,21 @@
+{
+    "name":  "maxsudetectionmeter",
+    "version-string":  "1.1.3",
+    "description":  "Detection Meter for Skyrim 1.7.104.0",
+    "license":  "GPL-3.0-or-later",
+    "dependencies":  [
+                         {
+                             "name":  "imgui",
+                             "features":  [
+                                              "dx11-binding",
+                                              "win32-binding"
+                                          ]
+                         },
+                         "spdlog"
+                     ],
+    "features":  {
+                     "mo2-install":  {
+                                         "description":  "Detection Meter"
+                                     }
+                 }
+}
