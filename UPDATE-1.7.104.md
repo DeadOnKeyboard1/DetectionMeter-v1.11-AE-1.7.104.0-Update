@@ -8,7 +8,8 @@ Teammates use the engine's IsPlayerTeammate flag; custom followers that never
 set this flag and have no allied commander need a mod-specific integration.
 Only meter visibility changes, not the engine's detection/stealth behavior.
 Mock tests cover direct/nested summons, missing ownership, dismissed followers,
-neutral/enemy ownership and cycles. In-game confirmation is still pending.
+neutral/enemy ownership and cycles. The final render-fix build was confirmed in
+game on Skyrim 1.7.104.0.
 
 Full package rebuilt from MaxsuDetectionMeter 1.1.1 source for SKSE 2.3.1.
 Original PNG textures, INI and optional dMenu JSON are retained from the supplied
@@ -41,7 +42,8 @@ SkyrimModDevKit/Extern headers, and the existing fmt/spdlog dependency prefix.
 
 Checks: tests/inspect-runtime.py, tests/runtime-helpers.cpp, matching DLL/PDB,
 package file hashes, original PNG signatures and dMenu JSON parsing.
-These are offline checks, not an in-game compatibility guarantee.
+These checks are supplemented by the user's successful in-game test of the
+final DLL on Skyrim 1.7.104.0.
 
 In-game test: sneak near a neutral NPC, become detected, repeat with hostile NPCs,
 turn the camera, enter/leave combat, open/close menus and reload a save. Check

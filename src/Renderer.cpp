@@ -39,7 +39,7 @@ namespace MaxsuDetectionMeter
 			return;
 		}
 
-		auto render_data = render_manager->data;
+		auto& render_data = render_manager->GetRuntimeData();
 
 		INFO("Getting swapchain...");
 		auto swapchain = render_data.renderWindows->swapChain;
@@ -50,13 +50,13 @@ namespace MaxsuDetectionMeter
 
 		INFO("Getting swapchain desc...");
 		DXGI_SWAP_CHAIN_DESC sd{};
-		if (swapchain->GetDesc(std::addressof(sd)) < 0) {
+		if (swapchain->GetDesc(reinterpret_cast<REX::W32::DXGI_SWAP_CHAIN_DESC*>(std::addressof(sd))) < 0) {
 			ERROR("IDXGISwapChain::GetDesc failed.");
 			return;
 		}
 
-		device = render_data.forwarder;
-		context = render_data.context;
+		device = reinterpret_cast<ID3D11Device*>(render_data.forwarder);
+		context = reinterpret_cast<ID3D11DeviceContext*>(render_data.context);
 		if (!device || !context) {
 			ERROR("DirectX device/context unavailable.");
 			return;
@@ -95,19 +95,25 @@ namespace MaxsuDetectionMeter
 
 	void Renderer::MenuPresentHook::Hook_PostDisplay(RE::IMenu* Menu)
 	{
-		if (D3DInitHook::initialized.load()) {
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-
-			Renderer::DrawMeters();
-
-			ImGui::EndFrame();
-			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());  // dear imgui defaults to RT slot 0
-		}
-
+		// Chain the game's/previous hook first. Improved Camera and other HUD hooks
+		// may depend on the render state exactly as Skyrim left it. Rendering our
+		// ImGui overlay before the chain can disturb that state and has historically
+		// been a compatibility problem with other camera/render plugins.
 		func(Menu);
+
+		if (!D3DInitHook::initialized.load() || !device || !context || !ImGui::GetCurrentContext())
+			return;
+
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		Renderer::DrawMeters();
+
+		ImGui::EndFrame();
+		ImGui::Render();
+		if (auto* drawData = ImGui::GetDrawData())
+			ImGui_ImplDX11_RenderDrawData(drawData);  // dear imgui defaults to RT slot 0
 	}
 
 	// Simple helper function to load an image into a DX11 texture with common settings
@@ -119,7 +125,7 @@ namespace MaxsuDetectionMeter
 			return false;
 		}
 
-		auto render_data = render_manager->data;
+		auto& render_data = render_manager->GetRuntimeData();
 
 		// Load from disk into a raw RGBA buffer
 		int image_width = 0;

@@ -21,9 +21,8 @@ DLLEXPORT inline constinit auto SKSEPlugin_Version = []() noexcept
 	data.PluginVersion(Plugin::Version);
 	data.PluginName(Plugin::NAME);
 	data.AuthorName(Plugin::AUTHOR);
-	data.UsesAddressLibrary(true);
-	data.HasNoStructUse(false);
-	data.UsesStructsPost629(true);
+	data.UsesAddressLibrary();
+	data.UsesUpdatedStructs();
 	data.CompatibleVersions({REL::Version{1, 7, 104, 0}});
 	data.MinimumRequiredXSEVersion(REL::Version{2, 3, 1, 0});
 
